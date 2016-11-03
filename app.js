@@ -46,7 +46,8 @@ try{
 	  console.log('Connected to postgres! Getting schemas...');
 
 	  client
-		.query('SELECT table_schema,table_name FROM information_schema.tables;')
+		//.query('SELECT table_schema,table_name FROM information_schema.tables;')
+		.query('select * from test1;')
 		.on('row', function(row) {
 		    res.writeHead(200, {"Content-Type": "text/html"});
 			res.write(JSON.stringify(row));
