@@ -31,6 +31,16 @@ app.get('/test', function(req, res){
 	});
 });
 
+app.get('/test2', function(req, res){
+	getTest2().then(function(rs){
+
+		res.writeHead(200, {"Content-Type": "text/html"});
+		res.write(rs);
+		res.end();
+	});
+});
+
+
 app.get('/db', function(req, res){
 try{
 	
@@ -73,6 +83,41 @@ function testDelay(){
 		return 'delay result';
 	});
 }
+
+function getTest2(){
+var pg = require('pg');
+return new Promise(function(resolve, reject){
+
+	var client = new pg.Client(process.env.DATABASE_URL);
+
+	// connect to our database
+	client.connect(function (err) {
+	  if (err){
+		  reject(err);
+	  } else {
+	  
+	 
+		  client.query('SELECT * from test2', function (err, result) {
+			  if (err){
+				  reject(err);
+			  } else {
+
+			
+				// disconnect the client
+				client.end(function (err) {
+				  if (err){
+					  reject(err);
+				  } else {
+					 resolve(result);  
+				  }
+				});
+			   }
+		  });
+	   }
+	});
+});
+}
+
 
 
 server.listen(port, function(){
