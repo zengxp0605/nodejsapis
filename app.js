@@ -1,4 +1,5 @@
 var express = require('express');
+var Promise = require('bluebird');
 var _ = require('underscore');
 var app = express();
 var server = require('http').Server(app);
@@ -8,7 +9,8 @@ var data = {
 	key: 'value', 
 	hello: 'world',
 	arr: _.range(5),
-	database_url: '' + process.env.DATABASE_URL,
+	test_url: '' + process.env.TEST_URL,
+	version :process.version,
 	
 };
 
@@ -21,9 +23,12 @@ app.get('/', function(req, res){
 
 app.get('/test', function(req, res){
 	console.log('test page');
-    res.writeHead(200, {"Content-Type": "text/html"});
-    res.write("<h2>Hello Test</h2>");
-	res.end();
+	testDelay().then(function(rs){
+
+		res.writeHead(200, {"Content-Type": "text/html"});
+		res.write('<h2>Hello Test -> ' + rs + '</h2>');
+		res.end();
+	});
 });
 
 app.get('/db', function(req, res){
@@ -62,6 +67,13 @@ try{
 }
 
 });
+
+function testDelay(){
+	return Promise.delay(1000).then(function(){
+		return 'delay result';
+	});
+}
+
 
 server.listen(port, function(){
 	console.log('socket on *:' + port)
