@@ -8,8 +8,10 @@
   },
   "dependencies": {
     "express": "^4.14.0",
+    "bluebird": "^3.4.6",
+    "underscore": "latest"
   },
   "devDependencies": {
-
+    "bluebird": "^3.4.6"
   }
 }
