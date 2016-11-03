@@ -1,0 +1,15 @@
+{
+  "name": "nodejsapis",
+  "description": "nodejs apis for heroku",
+  "author": "Jason Zeng",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+  },
+  "devDependencies": {
+
+  }
+}
