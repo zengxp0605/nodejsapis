@@ -3,8 +3,9 @@ var Promise = require('bluebird');
 var _ = require('underscore');
 var app = express();
 var server = require('http').Server(app);
+var isProdDB = process.env.NODE_PG_DB_PROD ? true : false;
 var port = process.env.PORT || 5000;
-var databaseUrl = process.env.DATABASE_URL || 'postgres://postgres:123456@localhost:5432/postgres';
+var databaseUrl = process.env.PG_DATABASE_URL; // || 'postgres://postgres:123456@localhost:5432/postgres';
 var testCount = 0;
 
 var data = {
@@ -12,16 +13,18 @@ var data = {
 	hello: 'world',
 	arr: _.range(5),
 	test_url: '' + process.env.TEST_URL,
+	PG_DATABASE_URL: '' + process.env.PG_DATABASE_URL,
+	isProdDB: isProdDB,
 	version: process.version,
 
 };
 
 //设置服务器跨域权限
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-  next();
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+	next();
 });
 
 app.get('/', function (req, res) {
@@ -33,7 +36,7 @@ app.get('/', function (req, res) {
 
 app.get('/test', function (req, res) {
 	console.log('test page');
-	testCount ++;
+	testCount++;
 	testDelay().then(function (rs) {
 
 		res.writeHead(200, { "Content-Type": "text/html" });
@@ -45,7 +48,7 @@ app.get('/test', function (req, res) {
 app.get('/test2', function (req, res) {
 	getTest2().then(function (rs) {
 
-		res.writeHead(200, { "Content-Type": "text/html" });
+		res.writeHead(200, { "Content-Type": "application/json" });
 		res.write(JSON.stringify(rs));
 		res.end();
 	});
@@ -55,7 +58,7 @@ app.get('/test2', function (req, res) {
 app.get('/db', function (req, res) {
 	var pg = require('pg');
 	console.log('test db');
-	//pg.defaults.ssl = true;
+	isProdDB && (pg.defaults.ssl = true);
 	pg.connect(databaseUrl, function (err, client) {
 		if (err) {
 			//throw err;
@@ -88,8 +91,8 @@ function testDelay() {
 function getTest2() {
 	var pg = require('pg');
 	return new Promise(function (resolve, reject) {
+		isProdDB && (pg.defaults.ssl = true);
 		var client = new pg.Client(databaseUrl);
-
 		// connect to our database
 		client.connect(function (err) {
 			if (err) {
